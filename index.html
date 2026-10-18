@@ -1,14 +1,7 @@
 <!-- Code By NhutCoder Team · https://nhutcoderteam.io.vn -->
 <!-- 
-  ╔══════════════════════════════════════════════════════════╗
-  ║  THU TÌNH YÊU — E-card 20/10                              ║
-  ║  Code By NhutCoder Team                                    ║
-  ║                                                            ║
-  ║  CÁCH TÙY CHỈNH (sửa code, không dùng UI):                ║
-  ║  1. Mở file js/config.js                                   ║
-  ║  2. Sửa 3 biến: RECIPIENT_NAME, WISH_MESSAGE, SIGNATURE   ║
-  ║  3. Save → deploy lại                                     ║
-  ╚══════════════════════════════════════════════════════════╝
+  CÁCH TÙY CHỈNH: sửa file js/config.js (5 biến: name, wish, signature, v.v.)
+  Không cần biết code — chỉ gõ tiếng Việt có dấu vào trong ngoặc kép.
 -->
 <!doctype html>
 <html lang="vi">
@@ -22,58 +15,29 @@
 
     <style>
         html, body {
-            margin: 0; width: 100%; height: 100%;
+            margin: 0px; width: 100%; height: 100%;
             overflow: hidden; background: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         }
         canvas { position: absolute; width: 100%; height: 100%; }
 
-        /* === Countdown === */
-        #countdown {
-            position: fixed; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10001; pointer-events: none;
-        }
-        #countdown .num {
-            font-size: clamp(5rem, 20vw, 10rem);
-            color: #ff5ba5; font-weight: 900;
-            text-shadow: 0 0 40px rgba(255,91,165,0.8), 0 0 80px rgba(255,91,165,0.4);
-            opacity: 0; transform: scale(0.5);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        #countdown .num.show { opacity: 1; transform: scale(1); }
-        #countdown .num.fade { opacity: 0; transform: scale(2); }
-
-        /* === Name display === */
         .namebox {
             color: #ff5ba5;
             position: absolute; z-index: 9999;
-            top: 38%; left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
+            transition: 1s;
             text-align: center;
             text-shadow: 0 0 30px rgba(255,91,165,0.8);
-            opacity: 0;
-            transition: opacity 1.5s ease;
         }
-        .namebox.show { opacity: 1; }
         .namebox h1 {
-            margin: 0;
+            margin: 0 auto;
             font-family: "Comic Sans MS", cursive, sans-serif;
-            font-size: clamp(2rem, 8vw, 4.5rem);
-            letter-spacing: 0.04em;
-        }
-        .namebox .subtitle {
-            font-size: clamp(0.7rem, 2.5vw, 1rem);
-            color: rgba(255,180,200,0.6);
-            margin-top: 8px;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
         }
 
-        /* === Typewriter wish === */
+        /* === Typewriter wish (added below namebox) === */
         .wishbox {
             position: absolute; z-index: 9999;
-            top: 58%; left: 50%;
+            top: 65%; left: 50%;
             transform: translateX(-50%);
             width: 90%; max-width: 620px;
             text-align: center;
@@ -86,7 +50,6 @@
             padding: 0 16px;
             opacity: 0;
             transition: opacity 1s ease;
-            min-height: 100px;
         }
         .wishbox.show { opacity: 1; }
         .wishbox .cursor {
@@ -109,149 +72,107 @@
             transition: opacity 1.5s ease;
         }
         .wishbox .signature.show { opacity: 1; }
-
-        /* === English text (small, top) === */
-        .eng-text {
-            position: absolute; z-index: 9999;
-            top: 20%; left: 50%;
-            transform: translateX(-50%);
-            font-size: clamp(0.6rem, 2vw, 0.85rem);
-            color: rgba(255,180,200,0.35);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            text-align: center;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 2s ease;
-        }
-        .eng-text.show { opacity: 1; }
     </style>
 </head>
 
 <body>
-    <!-- Canvas layers -->
+    <!-- Canvas layers (original, kept as-is) -->
     <canvas id="canvas-matrix" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
     <canvas style="position:absolute;width:100%;height:100%;z-index:9999" class="canvas"></canvas>
     <canvas id="pinkboard" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
 
-    <!-- Original overlay with tabs -->
+    <!-- Original overlay with tabs (kept from upstream) -->
     <div class="overlay">
         <div class="tabs">
-            <div class="tabs-labels"><span class="tabs-label">Commands</span><span class="tabs-label">Info</span><span class="tabs-label">Share</span></div>
+            <div class="tabs-labels"><span class="tabs-label">Commands</span><span class="tabs-label">Info</span><span
+                    class="tabs-label">Share</span></div>
             <div class="tabs-panels">
-                <ul class="tabs-panel commands"></ul>
+                <ul class="tabs-panel commands">
+                </ul>
             </div>
         </div>
     </div>
 
-    <!-- Countdown -->
-    <div id="countdown"><div class="num" id="countdown-num">3</div></div>
-
-    <!-- English text (decorative, top) -->
-    <div class="eng-text" id="eng-text">A Special Message For You</div>
-
-    <!-- Name display -->
-    <div class="namebox" id="namebox">
-        <h1 id="name-display"></h1>
-        <div class="subtitle" id="name-subtitle"></div>
+    <!-- Namebox (original — text overridden by config.js) -->
+    <div class="namebox" style="opacity: 0;">
+        <h1 id="name-display" style="font-family: 'Comic Sans MS', cursive, sans-serif;">Wuv U ❤ Bao Bao</h1>
     </div>
 
-    <!-- Typewriter wish -->
+    <!-- Typewriter wish (appears AFTER namebox — synced with original sequence) -->
     <div class="wishbox" id="wishbox">
         <span id="wish-text"></span><span class="cursor" id="cursor"></span>
         <span class="signature" id="signature"></span>
     </div>
 
-    <!-- Canvas scripts (original, kept as-is) -->
+    <!-- Original scripts (countdown + particle sequence + heart animation) -->
     <script src="js/config.js"></script>
     <script src="js/index.js"></script>
     <script src="js/heart.js"></script>
     <script src="js/matrix.js"></script>
 
-    <!-- === Main sequence script === -->
+    <!-- === Synced wish typewriter — starts AFTER original namebox appears === -->
     <script>
     (function() {
-        // === Read config from js/config.js (buyer edits this file) ===
+        // === Read config from js/config.js ===
         var cfg = window.ECARD_CONFIG || {
-            name: "Wuv U \u2764\ufe0f Bao Bao",
-            subtitle: "A Love Letter Just For You",
-            englishTop: "A Special Message For You",
-            wish: "Nh\u00e2n ng\u00e0y 20/10, ch\u00fac em lu\u00f4n xinh \u0111\u1eb9p, r\u1ea1ng r\u1ee1 nh\u01b0 \u0111\u00f3a h\u1ed3ng \u0111\u1ea7u m\u00f9a. Mong m\u1ed7i ng\u00e0y c\u1ee7a em \u0111\u1ec1u ng\u1eadp tr\u00e0n ti\u1ebfng c\u01b0\u1eddi v\u00e0 th\u1eadt nhi\u1ec1u y\u00eau th\u01b0\u01a1ng. C\u1ea3m \u01a1n em \u0111\u00e3 xu\u1ea5t hi\u1ec7n trong cu\u1ed9c \u0111\u1eddi c\u1ee7a anh, khi\u1ebfn th\u1ebf gi\u1edbi n\u00e0y d\u1ecbu d\u00e0ng h\u01a1n r\u1ea5t nhi\u1ec1u. Em l\u00e0 \u0111i\u1ec1u t\u1ed1t \u0111\u1eb9p nh\u1ea5t m\u00e0 anh t\u1eebng c\u00f3. Y\u00eau em h\u01a1n nh\u1eefng g\u00ec anh c\u00f3 th\u1ec3 n\u00f3i l\u00ean.",
+            name: "Wuv U \u2764 Bao Bao",
+            wish: "Nh\u00e2n ng\u00e0y 20/10, ch\u00fac em lu\u00f4n xinh \u0111\u1eb9p, r\u1ea1ng r\u1ee1 nh\u01b0 \u0111\u00f3a h\u1ed3ng \u0111\u1ea7u m\u00f9a. Mong m\u1ed7i ng\u00e0y c\u1ee7a em \u0111\u1ec1u ng\u1eadp tr\u00e0n ti\u1ebfng c\u01b0\u1eddi v\u00e0 th\u1eadt nhi\u1ec1u y\u00eau th\u01b0\u01a1ng. C\u1ea3m \u01a1n em \u0111\u00e3 xu\u1ea5t hi\u1ec7n trong cu\u1ed9c \u0111\u1eddi c\u1ee7a anh, khi\u1ebfn th\u1ebf gi\u1edbi n\u00e0y d\u1ecbu d\u00e0ng h\u01a1n r\u1ea5t nhi\u1ec1u. Em l\u00e0 \u0111i\u1ec1u t\u1ed1t \u0111\u1eb9p nh\u1ea5t m\u00e0 anh t\u1eebng c\u00f3.",
             signature: "\u2014 M\u1ed9t ng\u01b0\u1eddi lu\u00f4n ngh\u0129 \u0111\u1ebfn em \u2764"
         };
 
-        // === Apply config to DOM ===
-        document.getElementById("name-display").textContent = cfg.name;
-        document.getElementById("name-subtitle").textContent = cfg.subtitle || "";
-        document.getElementById("eng-text").textContent = cfg.englishTop || "A Special Message For You";
-        document.getElementById("signature").textContent = cfg.signature || "";
+        // === Override namebox text with config ===
+        var nameEl = document.getElementById("name-display");
+        if (cfg.name) nameEl.textContent = cfg.name;
 
-        var countdownEl = document.getElementById("countdown");
-        var countdownNum = document.getElementById("countdown-num");
-        var engText = document.getElementById("eng-text");
-        var namebox = document.getElementById("namebox");
+        var wishEl = document.getElementById("wish-text");
+        var sigEl = document.getElementById("signature");
+        var cursorEl = document.getElementById("cursor");
         var wishbox = document.getElementById("wishbox");
-        var wishText = document.getElementById("wish-text");
-        var cursor = document.getElementById("cursor");
-        var signature = document.getElementById("signature");
+        if (cfg.signature) sigEl.textContent = cfg.signature;
 
-        // === Sequence: countdown → English text → name → typewriter wish → signature ===
+        // === Watch for namebox becoming visible (synced with original sequence) ===
+        // The original index.js sets namebox opacity = 1 after the particle
+        // sequence completes (countdown 3-2-1 → You → Are → My → Love → rectangle).
+        // We poll for this change, then start the typewriter 1.5s later.
+        var namebox = document.querySelector(".namebox");
+        var wishStarted = false;
 
-        function showCountdown(num) {
-            countdownNum.textContent = num;
-            countdownNum.classList.add("show");
-            setTimeout(function() {
-                countdownNum.classList.remove("show");
-                countdownNum.classList.add("fade");
-                setTimeout(function() {
-                    countdownNum.classList.remove("fade");
-                }, 300);
-            }, 800);
+        function checkNamebox() {
+            if (wishStarted) return;
+            var opacity = window.getComputedStyle(namebox).opacity;
+            if (parseFloat(opacity) >= 0.9) {
+                wishStarted = true;
+                // Wait 1.5s after name appears, then start typewriter
+                setTimeout(startTypewriter, 1500);
+            } else {
+                // Keep checking every 200ms
+                setTimeout(checkNamebox, 200);
+            }
         }
 
-        function typewriter(text, element, speed, callback) {
+        function startTypewriter() {
+            wishbox.classList.add("show");
+            var text = cfg.wish || "";
             var i = 0;
-            element.textContent = "";
+            var speed = 45; // ms per character
+
             function type() {
                 if (i < text.length) {
-                    element.textContent += text.charAt(i);
+                    wishEl.textContent += text.charAt(i);
                     i++;
-                    setTimeout(type, speed + Math.random() * speed * 0.5);
-                } else if (callback) {
-                    callback();
+                    // Slight randomness for natural feel
+                    setTimeout(type, speed + Math.random() * speed * 0.4);
+                } else {
+                    // Typing done — hide cursor, show signature
+                    cursorEl.style.display = "none";
+                    sigEl.classList.add("show");
                 }
             }
             type();
         }
 
-        // === Run the sequence ===
-        // 1. Countdown 3-2-1
-        setTimeout(function() { showCountdown("3"); }, 500);
-        setTimeout(function() { showCountdown("2"); }, 1400);
-        setTimeout(function() { showCountdown("1"); }, 2300);
-
-        // 2. Hide countdown, show English text + name
-        setTimeout(function() {
-            countdownEl.style.transition = "opacity 0.5s";
-            countdownEl.style.opacity = "0";
-            engText.classList.add("show");
-        }, 3200);
-
-        // 3. Show name
-        setTimeout(function() {
-            namebox.classList.add("show");
-        }, 3800);
-
-        // 4. Start typewriter wish
-        setTimeout(function() {
-            wishbox.classList.add("show");
-            var wishSpeed = 45; // ms per char
-            typewriter(cfg.wish, wishText, wishSpeed, function() {
-                // 5. After wish complete → hide cursor → show signature
-                cursor.style.display = "none";
-                signature.classList.add("show");
-            });
-        }, 5000);
+        // Start watching after a short delay (let original scripts load)
+        setTimeout(checkNamebox, 500);
     })();
     </script>
 
