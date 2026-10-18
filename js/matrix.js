@@ -1,3 +1,4 @@
+// Code By NhutCoder Team · https://nhutcoderteam.io.vn
 // Initialising the canvas
 var canvas = document.getElementById('canvas-matrix'),
     ctx = canvas.getContext('2d');
