@@ -11,7 +11,7 @@ var letters = 'I LOVE U I LOVE U I LOVE U I LOVE U I LOVE U ❤';
 letters = letters.split('');
 
 // Larger font size for better visibility (was 10 → now 18)
-var fontSize = 18,
+var fontSize = 24,
     columns = canvas.width / fontSize;
 
 // Setup drops — each column starts at random Y for staggered effect
@@ -23,7 +23,7 @@ for (var i = 0; i < columns; i++) {
 // Draw function — runs every 33ms (~30fps)
 function draw() {
     // Fade trail effect (lower alpha = longer trails)
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < drops.length; i++) {
